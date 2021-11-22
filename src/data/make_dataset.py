@@ -82,7 +82,7 @@ def main(
     logger.info("making data with clean product column from processed data")
     # Create brand-enriched clean data.
     aggReports = aggReports[aggReports["product"].notna()]
-    aggReports.brand = aggReports.apply(brand_preprocess, axis=1)
+    aggReports["brand"] = aggReports.apply(brand_preprocess, axis=1)
     aggReports.to_csv(outPath / "clean_brand_data.csv")
 
 
