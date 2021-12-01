@@ -40,6 +40,12 @@ def age_preprocess(row):
     unit = row["age_units"]
     return row["patient_age"] * round(age_conv[unit],4)
 
+def strip_str(x):
+    if isinstance(x, str):
+        x = x.strip()
+    return x
+
+
 @click.command()
 @click.argument("input_dirpath", type=click.Path(exists=True))
 @click.argument("output_dirpath", type=click.Path())
@@ -57,11 +63,6 @@ def main(
 
     aggReports = None
 
-    def strip_str(x):
-        if isinstance(x, str):
-            x = x.strip()
-        return x
-
     for p in list(inPath.glob("*.csv")):
 
         curr_df = pd.read_csv(p, encoding="unicode_escape")
@@ -76,21 +77,29 @@ def main(
         aggReports = curr_df if aggReports is None else pd.concat([aggReports, curr_df])
 
     aggReports = aggReports.rename(columns={"description": "category"})
+    aggReports["caers_created_date"] = pd.to_datetime(aggReports.caers_created_date)
     aggReports.reset_index(drop=True, inplace=True)
-
     aggReports.to_csv(outPath / "clean_data.csv")
 
-    logger.info("making outcomes exploded data set from clean data")
+    # Create brand-enriched clean data.
+    logger.info("making data with clean brand name column from processed data")
+
+    aggReports = aggReports[aggReports["product"].notna()]
+    aggReports["brand"] = aggReports.apply(brand_preprocess, axis=1)
+    aggReports.to_csv(outPath / "clean_brand_data.csv")
 
     # Create exploded outcome-wise cleaned data
+    logger.info("making outcomes exploded data set from clean brand-name data")
+
     aggReports.outcomes = aggReports.outcomes.apply(
         lambda x: [y.strip() for y in x.split(",") if y != []]
     )
 
     expl_aggReports = aggReports.explode("outcomes")
-    expl_aggReports = expl_aggReports[["report_id", "product", "category", "outcomes"]]
+    expl_aggReports = expl_aggReports[
+        ["caers_created_date", "report_id", "product", "category", "outcomes", "brand"]
+    ]
     expl_aggReports = expl_aggReports.reset_index(drop=True)
-
     expl_aggReports.to_csv(outPath / "exploded_out.csv")
 
     logger.info("making data with clean product column from processed data")
@@ -99,13 +108,13 @@ def main(
     aggReports["brand"] = aggReports.apply(brand_preprocess, axis=1)
     aggReports.to_csv(outPath / "clean_brand_data.csv")
 
-    logger.info("converting age to a common unit year(s)")
-    # Create age cleaned data
-    
+    logger.info("converting age to a common unit year(s)")    
+    # Create age cleaned data    
     age_aggReports = aggReports[aggReports["patient_age"].notna()]
     age_aggReports["patient_age"] = age_aggReports.apply(age_preprocess,axis=1)
     age_aggReports.loc[:,"age_units"] = "year(s)"
     age_aggReports.to_csv(outPath / "clean_age_data.csv")
+
 
 
 if __name__ == "__main__":
