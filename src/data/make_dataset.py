@@ -2,6 +2,7 @@
 import click
 import logging
 from pathlib import Path
+from numpy import NaN
 import pandas as pd
 import re
 import string
@@ -26,19 +27,23 @@ def brand_preprocess(row, trim_len=2):
     return n_x[0]
 
 def age_preprocess(row):
-    '''This function converts age reports to a single unit : year(s)
-       since Data has age reported in multiple units like month(s),day(s)'''
+    """This function converts age reports to a single unit : year(s)
+       since Data has age reported in multiple units like month(s),day(s)
+
+    Args:
+        row ([pd.Series]): A row of the entire Dataframe
+
+    Returns:
+        [float]: value of patient_age converted to years unit 
+    """
+
     assert isinstance(row,pd.Series)
 
-    age_conv = {}
-    age_conv["month(s)"] = 1/12
-    age_conv["year(s)"] = 1
-    age_conv["day(s)"] = 1/365
-    age_conv["Decade(s)"] = 10
-    age_conv["week(s)"] = 1/52
-
+    age_conv = {"month(s)" : 1/12,"year(s)" : 1,"day(s)": 1/365,"Decade(s)":10,"week(s)": 1/52}
+    
     unit = row["age_units"]
-    return row["patient_age"] * round(age_conv[unit],4)
+    if unit == NaN: return -1
+    else: return row["patient_age"] * round(age_conv[unit],4)
 
 def strip_str(x):
     if isinstance(x, str):
@@ -110,9 +115,9 @@ def main(
 
     logger.info("converting age to a common unit year(s)")    
     # Create age cleaned data    
-    age_aggReports = aggReports[aggReports["patient_age"].notna()]
+    age_aggReports = aggReports[aggReports["patient_age"]]
     age_aggReports["patient_age"] = age_aggReports.apply(age_preprocess,axis=1)
-    age_aggReports.loc[:,"age_units"] = "year(s)"
+    age_aggReports = age_aggReports.drop(columns="age_units")
     age_aggReports.to_csv(outPath / "clean_age_data.csv")
 
 
