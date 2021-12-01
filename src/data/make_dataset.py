@@ -9,36 +9,56 @@ from nltk.corpus import stopwords
 
 
 def brand_preprocess(row, trim_len=2):
+    """ This function creates a brand name column by parsing out the product column of data. It trims the words based on trim length param to choose appropriate brand name.
 
-    regex = re.compile("[%s]" % re.escape(string.punctuation))
-    x = regex.sub("", row["product"])
+    Args:
+        row (pd.Series): Dataframe row
+        trim_len (int, optional): Length by which product name has to be trimmed. Defaults to 2.
 
-    stop = stopwords.words("english")
-    n_x = [_.upper() for _ in x.lower().split(" ") if _ not in stop]
+    Returns:
+        str: brand name corresponding to a product.
+    """
+    # Remove punctuations from product name
+    regexPunctuation = re.compile("[%s]" % re.escape(string.punctuation))
+    cleanProduct = regexPunctuation.sub("", row["product"])
 
-    if len(n_x) == 0:
+    nameList = [
+        _.upper()
+        for _ in cleanProduct.lower().split(" ")
+        if _ not in stopwords.words("english")
+    ]
+
+    if len(nameList) == 0:
         return ""
+
+    # for certain categories use trim length to select brand name.
     if row["category"] in [
         "Nuts/Edible Seed",
         "Vit/Min/Prot/Unconv Diet(Human/Animal)",
     ]:
-        return " ".join(n_x) if len(n_x) < trim_len else " ".join(n_x[:trim_len])
-    return n_x[0]
+        return (
+            " ".join(nameList)
+            if len(nameList) < trim_len
+            else " ".join(nameList[:trim_len])
+        )
+    return nameList[0]
+
 
 def age_preprocess(row):
-    '''This function converts age reports to a single unit : year(s)
-       since Data has age reported in multiple units like month(s),day(s)'''
-    assert isinstance(row,pd.Series)
+    """This function converts age reports to a single unit : year(s)
+       since Data has age reported in multiple units like month(s),day(s)"""
+    assert isinstance(row, pd.Series)
 
     age_conv = {}
-    age_conv["month(s)"] = 1/12
+    age_conv["month(s)"] = 1 / 12
     age_conv["year(s)"] = 1
-    age_conv["day(s)"] = 1/365
+    age_conv["day(s)"] = 1 / 365
     age_conv["Decade(s)"] = 10
-    age_conv["week(s)"] = 1/52
+    age_conv["week(s)"] = 1 / 52
 
     unit = row["age_units"]
-    return row["patient_age"] * round(age_conv[unit],4)
+    return row["patient_age"] * round(age_conv[unit], 4)
+
 
 def strip_str(x):
     if isinstance(x, str):
@@ -59,7 +79,7 @@ def main(
     inPath = Path(input_dirpath)
 
     logger = logging.getLogger(__name__)
-    logger.info("making final data set from raw data")
+    logger.info("Creating clean unified data from raw files")
 
     aggReports = None
 
@@ -81,40 +101,29 @@ def main(
     aggReports.reset_index(drop=True, inplace=True)
     aggReports.to_csv(outPath / "clean_data.csv")
 
-    # Create brand-enriched clean data.
-    logger.info("making data with clean brand name column from processed data")
+    logger.info("Processing and enriching data")
 
+    # Create brand-enriched column.
+    logger.info("Making brand name column from clean data")
     aggReports = aggReports[aggReports["product"].notna()]
     aggReports["brand"] = aggReports.apply(brand_preprocess, axis=1)
-    aggReports.to_csv(outPath / "clean_brand_data.csv")
 
-    # Create exploded outcome-wise cleaned data
+    # Pre-processing Age column.
+    logger.info("converting age to a common unit year(s)")
+    aggReports = aggReports[aggReports["patient_age"].notna()]
+    aggReports["patient_age"] = aggReports.apply(age_preprocess, axis=1)
+    aggReports = aggReports.drop(columns=["age_units"])
+
+    aggReports.to_csv(outPath / "processed_data.csv")
+
+    # Create exploded outcome-wise cleaned data.
     logger.info("making outcomes exploded data set from clean brand-name data")
-
     aggReports.outcomes = aggReports.outcomes.apply(
         lambda x: [y.strip() for y in x.split(",") if y != []]
     )
-
     expl_aggReports = aggReports.explode("outcomes")
-    expl_aggReports = expl_aggReports[
-        ["caers_created_date", "report_id", "product", "category", "outcomes", "brand"]
-    ]
     expl_aggReports = expl_aggReports.reset_index(drop=True)
-    expl_aggReports.to_csv(outPath / "exploded_out.csv")
-
-    logger.info("making data with clean product column from processed data")
-    # Create brand-enriched clean data.
-    aggReports = aggReports[aggReports["product"].notna()]
-    aggReports["brand"] = aggReports.apply(brand_preprocess, axis=1)
-    aggReports.to_csv(outPath / "clean_brand_data.csv")
-
-    logger.info("converting age to a common unit year(s)")    
-    # Create age cleaned data    
-    age_aggReports = aggReports[aggReports["patient_age"].notna()]
-    age_aggReports["patient_age"] = age_aggReports.apply(age_preprocess,axis=1)
-    age_aggReports.loc[:,"age_units"] = "year(s)"
-    age_aggReports.to_csv(outPath / "clean_age_data.csv")
-
+    expl_aggReports.to_csv(outPath / "exploded_data.csv")
 
 
 if __name__ == "__main__":
