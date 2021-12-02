@@ -2,7 +2,6 @@
 import click
 import logging
 from pathlib import Path
-from numpy import NaN
 import pandas as pd
 import re
 import string
@@ -67,7 +66,8 @@ def age_preprocess(row):
     }
 
     unit = row["age_units"]
-    if unit == NaN:
+    age = row["patient_age"]
+    if pd.isna(age) or pd.isna(unit):
         return -1
     else:
         return row["patient_age"] * round(age_conv[unit], 4)
