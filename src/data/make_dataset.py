@@ -114,7 +114,6 @@ def main(
 
     # Pre-processing Age column.
     logger.info("converting age to a common unit year(s)")
-    aggReports = aggReports[aggReports["patient_age"].notna()]
     aggReports["patient_age"] = aggReports.apply(age_preprocess, axis=1)
     aggReports = aggReports.drop(columns=["age_units"])
 
