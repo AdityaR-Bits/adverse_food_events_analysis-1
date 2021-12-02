@@ -56,13 +56,22 @@ def age_preprocess(row):
         [float]: value of patient_age converted to years unit 
     """
 
-    assert isinstance(row,pd.Series)
+    assert isinstance(row, pd.Series)
 
-    age_conv = {"month(s)" : 1/12,"year(s)" : 1,"day(s)": 1/365,"Decade(s)":10,"week(s)": 1/52}
-    
+    age_conv = {
+        "month(s)": 1 / 12,
+        "year(s)": 1,
+        "day(s)": 1 / 365,
+        "Decade(s)": 10,
+        "week(s)": 1 / 52,
+    }
+
     unit = row["age_units"]
-    if unit == NaN: return -1
-    else: return row["patient_age"] * round(age_conv[unit],4)
+    if unit == NaN:
+        return -1
+    else:
+        return row["patient_age"] * round(age_conv[unit], 4)
+
 
 def strip_str(x):
     if isinstance(x, str):
