@@ -5,7 +5,7 @@ import plotly.graph_objects as go
 import pandas as pd
 
 
-def brandsVsOutcomesPlot(
+def brands_vs_outcomes_plot(
     baseDf,
     category,
     title,
@@ -51,7 +51,7 @@ def brandsVsOutcomesPlot(
 
     relv_df = relv_df.rename(columns={"outcomes": "Outcomes"})
 
-    plotBarHistogram(relv_df, title=title, x="brand", color="Outcomes")
+    plot_bar_histogram(relv_df, title=title, x="brand", color="Outcomes")
 
     df = df[df["outcomes"].isin(relv_outcomes)]
     g_top = df.groupby(["brand"])["report_id"].count().sort_values(ascending=False)
@@ -69,7 +69,7 @@ def brandsVsOutcomesPlot(
     fig_pie.show()
 
 
-def plotBarHistogram(
+def plot_bar_histogram(
     df, title, x="brand", color="Outcomes", barmode="stack", logscale=False
 ):
     """This function plots bar histogram for columnn in dataframe with color as another column.

@@ -18,6 +18,9 @@ def brand_preprocess(row, trim_len=2):
     Returns:
         [str]: brand name corresponding to a product.
     """
+
+    if pd.isna(row["product"]) or pd.isna(row["product"]):
+        return pd.NA
     # Remove punctuations from product name
     regexPunctuation = re.compile("[%s]" % re.escape(string.punctuation))
     cleanProduct = regexPunctuation.sub("", row["product"])
@@ -118,18 +121,17 @@ def main(
 
     # Create brand-enriched column.
     logger.info("Making brand name column from clean data")
-    aggReports = aggReports[aggReports["product"].notna()]
     aggReports["brand"] = aggReports.apply(brand_preprocess, axis=1)
 
     # Pre-processing Age column.
-    logger.info("converting age to a common unit year(s)")
+    logger.info("Converting age to a common unit year(s)")
     aggReports["patient_age"] = aggReports.apply(age_preprocess, axis=1)
     aggReports = aggReports.drop(columns=["age_units"])
 
     aggReports.to_csv(outPath / "processed_data.csv")
 
     # Create exploded outcome-wise cleaned data.
-    logger.info("making outcomes exploded data set from clean brand-name data")
+    logger.info("Making outcomes exploded data set from clean brand-name data")
     aggReports.outcomes = aggReports.outcomes.apply(
         lambda x: [y.strip() for y in x.split(",") if y != []]
     )
