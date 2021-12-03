@@ -1,56 +1,78 @@
-adverse_food_events_analysis
+Adverse Food Events Analysis
 ==============================
 
 Detailed EDA of adverse food events reported to FDA.
 
-Project Organization
-------------
+
+## Team Members
+
+- Mohit Shah             (@razor139)
+- Aditya Rustagi         (@AdityaR-Bits)
+- Jianghong Wan          (@JWRickyWan)
+- Rajasvi Vinayak Sharma (@Rajasvi)
+- Sydney Larson          (@phoenix-flames)
+
+## Motivation and Objective 
+
+- Everyone gets sick due to bad food products. 
+- Study and analyse the [FDA data of reported adverse food events from 2004-2020.](https://www.fda.gov/food/compliance-enforcement/cfsan-adverse-event-reporting-system-caers)
+- Help users be aware of potential health risks before purchasing a product.
+
+## Required Packages
+- pandas
+```
+pip install pandas
+```
+- plotly
+```
+pip install plotly
+```
+- Natural Tool Kit
+```
+pip install nltk
+```
+
+
+## Project Organization
 
     ├── LICENSE
-    ├── Makefile           <- Makefile with commands like `make data` or `make train`
-    ├── README.md          <- The top-level README for developers using this project.
+    ├── README.md                  <- The top-level README for developers using this project.
+	├── ECE 143 Final Project.pdf  <- pdf of presentation.
     ├── data
-    │   ├── external       <- Data from third party sources.
-    │   ├── interim        <- Intermediate data that has been transformed.
-    │   ├── processed      <- The final, canonical data sets for modeling.
-    │   └── raw            <- The original, immutable data dump.
+    │   ├── processed      		   <- The final, canonical data sets for modeling.
+    │   └── raw            		   <- The original, immutable data dump.
     │
-    ├── docs               <- A default Sphinx project; see sphinx-doc.org for details
+    ├── notebooks          		   <- Jupyter notebooks for visualization and data cleaning. 
     │
-    ├── models             <- Trained and serialized models, model predictions, or model summaries
+    ├── references         		   <- News clippings related to adverse food events. 
     │
-    ├── notebooks          <- Jupyter notebooks. Naming convention is a number (for ordering),
-    │                         the creator's initials, and a short `-` delimited description, e.g.
-    │                         `1.0-jqp-initial-data-exploration`.
+    ├── reports            		   <- Generated analysis as HTML, PDF, LaTeX, etc.
+    │   └── figures        		   <- Generated graphics and figures used in presentation. 
     │
-    ├── references         <- Data dictionaries, manuals, and all other explanatory materials.
-    │
-    ├── reports            <- Generated analysis as HTML, PDF, LaTeX, etc.
-    │   └── figures        <- Generated graphics and figures to be used in reporting
-    │
-    ├── requirements.txt   <- The requirements file for reproducing the analysis environment, e.g.
-    │                         generated with `pip freeze > requirements.txt`
-    │
-    ├── setup.py           <- makes project pip installable (pip install -e .) so src can be imported
-    ├── src                <- Source code for use in this project.
-    │   ├── __init__.py    <- Makes src a Python module
-    │   │
-    │   ├── data           <- Scripts to download or generate data
-    │   │   └── make_dataset.py
-    │   │
-    │   ├── features       <- Scripts to turn raw data into features for modeling
-    │   │   └── build_features.py
-    │   │
-    │   ├── models         <- Scripts to train models and then use trained models to make
-    │   │   │                 predictions
-    │   │   ├── predict_model.py
-    │   │   └── train_model.py
-    │   │
-    │   └── visualization  <- Scripts to create exploratory and results oriented visualizations
-    │       └── visualize.py
-    │
-    └── tox.ini            <- tox file with settings for running tox; see tox.readthedocs.io
+    └── src                		   <- Source code for use in this project.
+        ├── __init__.py    		   <- Makes src a Python module.
+        │
+        ├── data           		   <- Scripts to generate data.
+        │   └── make_dataset.py
+        │
+        └── visualization  		   <- Script to create exploratory and results oriented visualizations.
+            └── visualize.py
+    
 
+
+## Running the Code 
+
+### Data Cleaning
+
+Script for cleaning the raw data is found in <code>src/data</code>.
+
+```
+python make_dataset.py
+```
+
+### Visualization
+
+Notebook for visualization of data is found in <code>src/visualization</code>.
 
 --------
 
