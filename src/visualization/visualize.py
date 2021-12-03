@@ -355,7 +355,7 @@ def top_symptoms(dic, title):
     """Find and plot top symptoms in the dictionary based on count
 
     Args:
-        dic (dict): Dictionary containing text-count pair
+        dic (dict): Dictionary containing text-count pair where key is text and count is value
 
     Returns:
         [dictionary]: Top 5 symptoms with their count
