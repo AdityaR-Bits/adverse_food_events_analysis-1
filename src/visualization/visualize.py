@@ -1,3 +1,4 @@
+from pandas.core.frame import DataFrame
 import plotly.express as px
 from collections import defaultdict
 from plotly.subplots import make_subplots
@@ -307,12 +308,12 @@ def plot_normalized_scatters(groups,group_names):
         ))
 
     
-def symptom_counter(file_name: str, variable: int = 0):
+def symptom_counter(data: DataFrame, variable: int = 0):
     """This function will return a dictionary containing counts of each symptom present in data file under a given condition, 
     dictated by variable
 
     Args:
-        file_name (str): The CSV file on which function will execute
+        data (DataFrame): The data to be analyzed
         cosmetic (int): 0 -> all categories, all products
                         1 -> only for cosmetics as a categorie
                         2 -> only for quorn as a product
@@ -322,13 +323,13 @@ def symptom_counter(file_name: str, variable: int = 0):
     """
 
     assert (
-        isinstance(file_name, str) and len(file_name) > 0
-    ), "file_name is either empty or not a string"
+        isinstance(data, DataFrame) and len(data) > 0
+    ), "Data either empty or not of type dataframe"
     assert (
         isinstance(variable, int) and 0 <= variable <= 2
     ), "variable is not an integer in the range [0,2]"
     dic = defaultdict(int)
-    data = pd.read_csv(file_name)
+    #data = pd.read_csv(file_name)
     if variable == 1:
         data = data.drop(data.index[(data["category"] != "Cosmetics")])
     elif variable == 2:
@@ -386,19 +387,18 @@ def top_symptoms(dic, title):
     return top5
 
 
-def top_vitamins_symptom_distribution(file_name):
+def top_vitamins_symptom_distribution(data):
     """This function will plot a histogram for Reported Cases vs Products, where Products are the top vitamin products causing the
     top 5 symptoms
 
     Args:
-        file_name (str): Name of the file used
+        data (DataFrame): DataFrame to be analyzed
     """
     assert (
-        isinstance(file_name, str) and len(file_name) > 0
-    ), "file_name is either empty or a non string"
+        isinstance(data, DataFrame) and len(data) > 0
+    ), "Data is either empty or not of type DataFrame"
     fig = go.Figure()
     symptom_list = ["DIARRHOEA", "VOMITING", "NAUSEA", "ABDOMINAL PAIN"]
-    data = pd.read_csv(file_name)
     data["category"] = data["category"].str.strip()
     grouped_desc = data.groupby("category")
     add_on_list = []
