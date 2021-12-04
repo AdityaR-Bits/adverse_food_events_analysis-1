@@ -139,6 +139,28 @@ def main(
     expl_aggReports = expl_aggReports.reset_index(drop=True)
     expl_aggReports.to_csv(outPath / "exploded_data.csv")
 
+    # Create time-stamp processed & exploded data.
+    aggReports_time = aggReports.drop_duplicates(
+        ["report_id", "patient_age", "category", "sex"], ignore_index=True
+    )
+    aggReports_time["year"] = aggReports_time["caers_created_date"].apply(
+        lambda x: x.year
+    )
+    aggReports_time = aggReports_time.rename(
+        columns={"caers_created_date": "time_stamp"}
+    )
+    aggReports_time.to_csv(outPath / "clean_data_time.csv")
+
+    expl_aggReports_time = aggReports_time.explode("outcomes")
+    expl_aggReports_time["outcomes"] = expl_aggReports_time["outcomes"].str.strip()
+    expl_aggReports_time.loc[
+        expl_aggReports_time["outcomes"] == "", "outcomes"
+    ] = "Not Specified"
+    expl_aggReports_time = expl_aggReports_time.reset_index(drop=True)
+    expl_aggReports_time.to_csv(outPath / "exploded_data_time.csv")
+
+    logger.info("Data cleaning and pre-processing done!")
+
 
 if __name__ == "__main__":
     log_fmt = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
