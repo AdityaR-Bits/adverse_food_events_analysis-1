@@ -8,16 +8,16 @@ import numpy as np
 
 
 def brands_vs_outcomes_plot(
-        baseDf,
-        category,
-        title,
-        relv_outcomes=[
-            "Death",
-            "Life Threatening",
-            "Hospitalization",
-            "Disability",
-            "Patient Visited ER",
-        ],
+    baseDf,
+    category,
+    title,
+    relv_outcomes=[
+        "Death",
+        "Life Threatening",
+        "Hospitalization",
+        "Disability",
+        "Patient Visited ER",
+    ],
 ):
     """ This function plots histogram for the brand names for each category colored with respect to all outcomes.
 
@@ -40,7 +40,7 @@ def brands_vs_outcomes_plot(
 
     df = baseDf[
         (baseDf["category"] == category) & (baseDf["product"] != "EXEMPTION 4")
-        ].copy()
+    ].copy()
 
     df.dropna(inplace=True)
 
@@ -133,14 +133,18 @@ def plot_time_trend(df, title, x_col="date", y_col="counts"):
     assert isinstance(title, str), "Check whether title is string"
     assert isinstance(x_col, str), "Check whether x_col is string"
     assert isinstance(y_col, str), "Check whether y_col is string"
-    year_month = pd.DataFrame(df['time_stamp'].groupby(df.time_stamp.dt.to_period("M")).agg('count').items(),
-                              columns=["date", "counts"]).sort_values(by=["date"])
+    year_month = pd.DataFrame(
+        df["time_stamp"].groupby(df.time_stamp.dt.to_period("M")).agg("count").items(),
+        columns=["date", "counts"],
+    ).sort_values(by=["date"])
     year_month["date"] = year_month["date"].apply(lambda x: x.to_timestamp())
     fig = px.line(year_month, x=x_col, y=y_col, title=title)
     fig.show()
 
 
-def plot_pie_subplots_yearly(group, title, column_name, dropping=False, d_threshold=1 / 50):
+def plot_pie_subplots_yearly(
+    group, title, column_name, dropping=False, d_threshold=1 / 50
+):
     """ This function returns subplots of yearly piechart for the input column name
 
     Args:
@@ -155,12 +159,15 @@ def plot_pie_subplots_yearly(group, title, column_name, dropping=False, d_thresh
     Returns: a subplot of pie charts
 
     """
-    assert isinstance(group, pd.core.groupby.generic.DataFrameGroupBy),"Check whether group is Pandas groupby object"
-    assert isinstance(title, str),"Check whether title is str."
-    assert isinstance(column_name, str),"Check whether column_name is str or not."
-    assert isinstance(dropping, bool),"Check whether dropping is bool."
-    assert isinstance(d_threshold, float) and 0 < d_threshold < 1,"Check whether d_threshold is float and between 0 " \
-                                                                  "and 1 "
+    assert isinstance(
+        group, pd.core.groupby.generic.DataFrameGroupBy
+    ), "Check whether group is Pandas groupby object"
+    assert isinstance(title, str), "Check whether title is str."
+    assert isinstance(column_name, str), "Check whether column_name is str or not."
+    assert isinstance(dropping, bool), "Check whether dropping is bool."
+    assert isinstance(d_threshold, float) and 0 < d_threshold < 1, (
+        "Check whether d_threshold is float and between 0 " "and 1 "
+    )
 
     specs = np.full((6, 3), {"type": "pie"}).tolist()
     fig = make_subplots(
@@ -202,7 +209,9 @@ def plot_pie_subplots_yearly(group, title, column_name, dropping=False, d_thresh
     fig.show()
 
 
-def plot_scatters(group, group_names, title, fil=False, filter_list=None, plot_now=False):
+def plot_scatters(
+    group, group_names, title, fil=False, filter_list=None, plot_now=False
+):
     """This function will return a scatter plot of the input group names, with respect to time
 
     Args:
@@ -216,12 +225,18 @@ def plot_scatters(group, group_names, title, fil=False, filter_list=None, plot_n
     Returns: a time series plot
 
     """
-    assert isinstance(group, pd.core.groupby.generic.DataFrameGroupBy),"Check whether group is Pandas groupby object or not."
-    assert isinstance(group_names, list) and all(isinstance(x, str) for x in group_names),"Check whether group_names is a list of strings only."
-    assert isinstance(fil, bool),"Check whether fil is a boolean."
-    assert isinstance(filter_list, list) or filter_list is None, "Check whether filter_list is only list or None."
-    assert isinstance(plot_now, bool),"Check whether plot_now is a boolean."
-    assert isinstance(title, str),"Check whether title is a string."
+    assert isinstance(
+        group, pd.core.groupby.generic.DataFrameGroupBy
+    ), "Check whether group is Pandas groupby object or not."
+    assert isinstance(group_names, list) and all(
+        isinstance(x, str) for x in group_names
+    ), "Check whether group_names is a list of strings only."
+    assert isinstance(fil, bool), "Check whether fil is a boolean."
+    assert (
+        isinstance(filter_list, list) or filter_list is None
+    ), "Check whether filter_list is only list or None."
+    assert isinstance(plot_now, bool), "Check whether plot_now is a boolean."
+    assert isinstance(title, str), "Check whether title is a string."
     fig = go.Figure()
     for i in range(len(group_names)):
         if fil and group_names[i] in filter_list:
@@ -266,8 +281,10 @@ def get_quorn_pie(exploded_df):
     Returns: the pie chart for quorn
 
     """
-    assert isinstance(exploded_df, pd.DataFrame),"Check whether exploded_df is a pd DataFrame."
-    exploded_df = exploded_df.rename(columns={'product': 'products'})
+    assert isinstance(
+        exploded_df, pd.DataFrame
+    ), "Check whether exploded_df is a pd DataFrame."
+    exploded_df = exploded_df.rename(columns={"product": "products"})
     quorn = exploded_df[exploded_df.products.str.contains("QUORN") == True]
     fig = go.Figure()
     outcome_quorn = quorn.groupby("outcomes")
@@ -292,7 +309,9 @@ def get_quorn_bar(exploded_df):
     Returns:the bar chart of quorn outcomes
 
     """
-    assert isinstance(exploded_df, pd.DataFrame),"Check whether exploded_df is a pd DataFrame."
+    assert isinstance(
+        exploded_df, pd.DataFrame
+    ), "Check whether exploded_df is a pd DataFrame."
     quorn = exploded_df[exploded_df.products.str.contains("QUORN") == True]
     k = quorn[["outcomes", "year"]]
     fig = px.histogram(
@@ -311,9 +330,13 @@ def plot_normalized_scatters(groups, group_names):
     Returns:a normalized scatter over time over groups
 
     """
-    assert isinstance(groups, list),"Check whether groups is a list."
-    assert all(isinstance(x, pd.DataFrame) for x in groups),"Check whether every element in groups is a pd DataFrame."
-    assert isinstance(group_names, list) and all(isinstance(x, str) for x in group_names),"Check whether group_names is list of string."
+    assert isinstance(groups, list), "Check whether groups is a list."
+    assert all(
+        isinstance(x, pd.DataFrame) for x in groups
+    ), "Check whether every element in groups is a pd DataFrame."
+    assert isinstance(group_names, list) and all(
+        isinstance(x, str) for x in group_names
+    ), "Check whether group_names is list of string."
     fig = go.Figure()
     for i in range(len(group_names)):
         cat = groups[i]
@@ -362,7 +385,7 @@ def symptom_counter(data: pd.DataFrame, variable: int = 0):
         isinstance(data, pd.DataFrame) and len(data) > 0
     ), "data is either empty or not a DataFrame"
     assert (
-            isinstance(variable, int) and 0 <= variable <= 2
+        isinstance(variable, int) and 0 <= variable <= 2
     ), "variable is not an integer in the range [0,2]"
     dic = defaultdict(int)
     if variable == 1:
