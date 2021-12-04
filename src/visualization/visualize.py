@@ -116,13 +116,13 @@ def plot_bar_histogram(
 
     
 def plot_time_trend(df, title, x_col="date", y_col="counts"):
-    """
+    """This function returns a plot for time series of input df
 
     Args:
-        df: input dataframe
-        title: title of the graph
-        x_col: x-axis column name
-        y_col: y-axis column name
+        df(pd.DataFrame): input dataframe
+        title(str): title of the graph
+        x_col(str): x-axis column name
+        y_col(str): y-axis column name
 
     Returns: the plotly figure for time series plot
 
@@ -139,17 +139,16 @@ def plot_time_trend(df, title, x_col="date", y_col="counts"):
 
 
 def plot_pie_subplots_yearly(group, title, column_name, dropping=False, d_threshold=1 / 50):
-    """
+    """ This function returns subplots of yearly piechart for the input column name
 
     Args:
-        d_threshold:
-        group: input pandas groupby object
-        title: title of the plot
-        column_name: the column name of the data of interests
-        col_num: number of columns
-        row_num: number of rows
-        dropping: if the data needs to group data with respect to d_threshold to "Others"
-        d_threshold: dropping threshold
+        group(pd.core.groupby.generic.DataFrameGroupBy): input pandas groupby object
+        title(str): title of the plot
+        column_name(str): the column name of the data of interests
+        col_num(int): number of columns
+        row_num(int): number of rows
+        dropping(bool): if the data needs to group data with respect to d_threshold to "Others"
+        d_threshold(float): dropping threshold
 
     Returns: a subplot of pie charts
 
@@ -184,15 +183,15 @@ def plot_pie_subplots_yearly(group, title, column_name, dropping=False, d_thresh
 
 
 def plot_scatters(group, group_names, title, fil=False, filter_list=None, plot_now=False):
-    """
+    """This function will return a scatter plot of the input group names, with respect to time
 
     Args:
-        group: input pandas groupby object
-        group_names: the name of groups of interest
-        filter: if some groups needs to be dropped
-        filter_list: the list of groups that needs to be dropped
-        file_path: the path for saving images
-        title: title of the graph
+        group(pd.core.groupby.generic.DataFrameGroupBy): input pandas groupby object
+        group_names(list): the name of groups of interest
+        filter(bool): if some groups needs to be dropped
+        filter_list(list): the list of groups that needs to be dropped
+        file_path(str): the path for saving images
+        title(str): title of the graph
 
     Returns: a time series plot
 
@@ -235,10 +234,10 @@ def plot_scatters(group, group_names, title, fil=False, filter_list=None, plot_n
 
 
 def get_quorn_pie(exploded_df):
-    """
+    """ This function will return a pie chart of product pie chart for Quorn
 
     Args:
-        exploded_df: the exploded_dataframe
+        exploded_df(pd.DataFrame): the exploded_dataframe
 
     Returns: the pie chart for quorn
 
@@ -254,10 +253,10 @@ def get_quorn_pie(exploded_df):
     fig.show()
 
 def get_quorn_bar(exploded_df):
-    """
+    """This function will return a bar graph for Quorn analysis
 
     Args:
-        exploded_df: the exploded_dataframe
+        exploded_df(pd.DataFrame): the exploded_dataframe
 
     Returns:the bar chart of quorn outcomes
 
@@ -274,13 +273,13 @@ def get_quorn_bar(exploded_df):
     fig.show()
 
 def plot_normalized_scatters(groups,group_names):
-    """
+    """ This function will return a normalized scatter plot over input groups
 
     Args:
-        df: input dataframe
-        groups: groups that want to plot and normalized
+        df(pd.DataFrame): input dataframe
+        groups(list): groups that want to plot and normalized
 
-    Returns:a normalized scatter over time
+    Returns:a normalized scatter over time over groups
 
     """
     assert isinstance(groups, list)
