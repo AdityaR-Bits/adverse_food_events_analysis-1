@@ -5,17 +5,18 @@ import plotly.graph_objects as go
 import pandas as pd
 import numpy as np
 
+
 def brands_vs_outcomes_plot(
-    baseDf,
-    category,
-    title,
-    relv_outcomes=[
-        "Death",
-        "Life Threatening",
-        "Hospitalization",
-        "Disability",
-        "Patient Visited ER",
-    ],
+        baseDf,
+        category,
+        title,
+        relv_outcomes=[
+            "Death",
+            "Life Threatening",
+            "Hospitalization",
+            "Disability",
+            "Patient Visited ER",
+        ],
 ):
     """ This function plots histogram for the brand names for each category colored with respect to all outcomes.
 
@@ -38,7 +39,7 @@ def brands_vs_outcomes_plot(
 
     df = baseDf[
         (baseDf["category"] == category) & (baseDf["product"] != "EXEMPTION 4")
-    ].copy()
+        ].copy()
 
     df.dropna(inplace=True)
 
@@ -114,7 +115,7 @@ def plot_bar_histogram(
 
     fig.show()
 
-    
+
 def plot_time_trend(df, title, x_col="date", y_col="counts"):
     """This function returns a plot for time series of input df
 
@@ -127,10 +128,10 @@ def plot_time_trend(df, title, x_col="date", y_col="counts"):
     Returns: the plotly figure for time series plot
 
     """
-    assert isinstance(df, pd.DataFrame)
-    assert isinstance(title, str)
-    assert isinstance(x_col, str)
-    assert isinstance(y_col, str)
+    assert isinstance(df, pd.DataFrame), "Check whether df is Pandas Dataframe or not."
+    assert isinstance(title, str), "Check whether title is string"
+    assert isinstance(x_col, str), "Check whether x_col is string"
+    assert isinstance(y_col, str), "Check whether y_col is string"
     year_month = pd.DataFrame(df['time_stamp'].groupby(df.time_stamp.dt.to_period("M")).agg('count').items(),
                               columns=["date", "counts"]).sort_values(by=["date"])
     year_month["date"] = year_month["date"].apply(lambda x: x.to_timestamp())
@@ -153,11 +154,12 @@ def plot_pie_subplots_yearly(group, title, column_name, dropping=False, d_thresh
     Returns: a subplot of pie charts
 
     """
-    assert isinstance(group, pd.core.groupby.generic.DataFrameGroupBy)
-    assert isinstance(title, str)
-    assert isinstance(column_name, str)
-    assert isinstance(dropping, bool)
-    assert isinstance(d_threshold, float) and 0 < d_threshold < 1
+    assert isinstance(group, pd.core.groupby.generic.DataFrameGroupBy),"Check whether group is Pandas groupby object"
+    assert isinstance(title, str),"Check whether title is str."
+    assert isinstance(column_name, str),"Check whether column_name is str or not."
+    assert isinstance(dropping, bool),"Check whether dropping is bool."
+    assert isinstance(d_threshold, float) and 0 < d_threshold < 1,"Check whether d_threshold is float and between 0 " \
+                                                                  "and 1 "
 
     specs = np.full((6, 3), {"type": "pie"}).tolist()
     fig = make_subplots(rows=6, cols=3, start_cell="top-left", specs=specs, vertical_spacing=0.01,
@@ -188,20 +190,20 @@ def plot_scatters(group, group_names, title, fil=False, filter_list=None, plot_n
     Args:
         group(pd.core.groupby.generic.DataFrameGroupBy): input pandas groupby object
         group_names(list): the name of groups of interest
-        filter(bool): if some groups needs to be dropped
+        fil(bool): if some groups needs to be dropped
         filter_list(list): the list of groups that needs to be dropped
-        file_path(str): the path for saving images
         title(str): title of the graph
+        plot_now(bool): if the plot needs to be plotted right now, if false, return the plotly object
 
     Returns: a time series plot
 
     """
-    assert isinstance(group, pd.core.groupby.generic.DataFrameGroupBy)
-    assert isinstance(group_names, list) and all(isinstance(x, str) for x in group_names)
-    assert isinstance(fil, bool)
-    assert isinstance(filter_list, list) or filter_list is None
-    assert isinstance(plot_now, bool)
-    assert isinstance(title, str)
+    assert isinstance(group, pd.core.groupby.generic.DataFrameGroupBy),"Check whether group is Pandas groupby object or not."
+    assert isinstance(group_names, list) and all(isinstance(x, str) for x in group_names),"Check whether group_names is a list of strings only."
+    assert isinstance(fil, bool),"Check whether fil is a boolean."
+    assert isinstance(filter_list, list) or filter_list is None, "Check whether filter_list is only list or None."
+    assert isinstance(plot_now, bool),"Check whether plot_now is a boolean."
+    assert isinstance(title, str),"Check whether title is a string."
     fig = go.Figure()
     for i in range(len(group_names)):
         if fil and group_names[i] in filter_list:
@@ -242,7 +244,7 @@ def get_quorn_pie(exploded_df):
     Returns: the pie chart for quorn
 
     """
-    assert isinstance(exploded_df, pd.DataFrame)
+    assert isinstance(exploded_df, pd.DataFrame),"Check whether exploded_df is a pd DataFrame."
     exploded_df = exploded_df.rename(columns={'product': 'products'})
     quorn = exploded_df[exploded_df.products.str.contains("QUORN") == True]
     fig = go.Figure()
@@ -251,6 +253,7 @@ def get_quorn_pie(exploded_df):
     outcomes = list(outcome_quorn["outcomes"].agg("count").sort_values(ascending=False).index)
     fig.add_trace(go.Pie(values=count, labels=outcomes, textinfo='none', title="outcome from QUORN"))
     fig.show()
+
 
 def get_quorn_bar(exploded_df):
     """This function will return a bar graph for Quorn analysis
@@ -261,7 +264,7 @@ def get_quorn_bar(exploded_df):
     Returns:the bar chart of quorn outcomes
 
     """
-    assert isinstance(exploded_df, pd.DataFrame)
+    assert isinstance(exploded_df, pd.DataFrame),"Check whether exploded_df is a pd DataFrame."
     quorn = exploded_df[exploded_df.products.str.contains("QUORN") == True]
     k = quorn[["outcomes", "year"]]
     fig = px.histogram(
@@ -272,7 +275,8 @@ def get_quorn_bar(exploded_df):
     )
     fig.show()
 
-def plot_normalized_scatters(groups,group_names):
+
+def plot_normalized_scatters(groups, group_names):
     """ This function will return a normalized scatter plot over input groups
 
     Args:
@@ -282,9 +286,9 @@ def plot_normalized_scatters(groups,group_names):
     Returns:a normalized scatter over time over groups
 
     """
-    assert isinstance(groups, list)
-    assert all(isinstance(x,pd.DataFrame) for x in groups)
-    assert isinstance(group_names, list) and all(isinstance(x, str) for x in group_names)
+    assert isinstance(groups, list),"Check whether groups is a list."
+    assert all(isinstance(x, pd.DataFrame) for x in groups),"Check whether every element in groups is a pd DataFrame."
+    assert isinstance(group_names, list) and all(isinstance(x, str) for x in group_names),"Check whether group_names is list of string."
     fig = go.Figure()
     for i in range(len(group_names)):
         cat = groups[i]
@@ -305,7 +309,7 @@ def plot_normalized_scatters(groups,group_names):
             color="#7f7f7f"
         ))
 
-    
+
 def symptom_counter(file_name: str, variable: int = 0):
     """This function will return a dictionary containing counts of each symptom present in data file under a given condition, 
     dictated by variable
@@ -321,10 +325,10 @@ def symptom_counter(file_name: str, variable: int = 0):
     """
 
     assert (
-        isinstance(file_name, str) and len(file_name) > 0
+            isinstance(file_name, str) and len(file_name) > 0
     ), "file_name is either empty or not a string"
     assert (
-        isinstance(variable, int) and 0 <= variable <= 2
+            isinstance(variable, int) and 0 <= variable <= 2
     ), "variable is not an integer in the range [0,2]"
     dic = defaultdict(int)
     data = pd.read_csv(file_name)
@@ -393,7 +397,7 @@ def top_vitamins_symptom_distribution(file_name):
         file_name (str): Name of the file used
     """
     assert (
-        isinstance(file_name, str) and len(file_name) > 0
+            isinstance(file_name, str) and len(file_name) > 0
     ), "file_name is either empty or a non string"
     fig = go.Figure()
     symptom_list = ["DIARRHOEA", "VOMITING", "NAUSEA", "ABDOMINAL PAIN"]
@@ -439,4 +443,3 @@ def top_vitamins_symptom_distribution(file_name):
     )
     fig.update_layout(barmode="stack", bargap=0.1)
     fig.show()
-
