@@ -2,6 +2,7 @@ import plotly.express as px
 from collections import defaultdict
 from plotly.subplots import make_subplots
 import plotly.graph_objects as go
+import plotly.figure_factory as ff
 import pandas as pd
 import numpy as np
 
@@ -72,7 +73,7 @@ def brands_vs_outcomes_plot(
 
 
 def plot_bar_histogram(
-        df, title, x="brand", color="Outcomes", barmode="stack", logscale=False
+    df, title, x="brand", color="Outcomes", barmode="stack", logscale=False
 ):
     """This function plots bar histogram for columnn in dataframe with color as another column.
 
@@ -162,25 +163,42 @@ def plot_pie_subplots_yearly(group, title, column_name, dropping=False, d_thresh
                                                                   "and 1 "
 
     specs = np.full((6, 3), {"type": "pie"}).tolist()
-    fig = make_subplots(rows=6, cols=3, start_cell="top-left", specs=specs, vertical_spacing=0.01,
-                        horizontal_spacing=0.01)
+    fig = make_subplots(
+        rows=6,
+        cols=3,
+        start_cell="top-left",
+        specs=specs,
+        vertical_spacing=0.01,
+        horizontal_spacing=0.01,
+    )
     row = 1
     col = 1
     for i in range(2004, 2021):
-        year_category = pd.DataFrame(group.get_group(i)[column_name].
-                                     value_counts().items(), columns=[column_name, "counts"]).sort_values(by=['counts'])
+        year_category = pd.DataFrame(
+            group.get_group(i)[column_name].value_counts().items(),
+            columns=[column_name, "counts"],
+        ).sort_values(by=["counts"])
         total = year_category["counts"].sum()
         if dropping:
-            year_category.loc[year_category['counts'] < total / 50, column_name] = 'Other'
-        fig.add_trace(go.Pie(values=year_category["counts"], labels=year_category[column_name], textinfo='none'
-                             , title="%d" % i), row=row, col=col)
+            year_category.loc[
+                year_category["counts"] < total / 50, column_name
+            ] = "Other"
+        fig.add_trace(
+            go.Pie(
+                values=year_category["counts"],
+                labels=year_category[column_name],
+                textinfo="none",
+                title="%d" % i,
+            ),
+            row=row,
+            col=col,
+        )
         if col == 3:
             col = 1
             row += 1
         else:
             col += 1
-    fig.layout.update(title=title,
-                      height=1000, width=1000, hovermode='closest')
+    fig.layout.update(title=title, height=1000, width=1000, hovermode="closest")
     fig.show()
 
 
@@ -209,26 +227,30 @@ def plot_scatters(group, group_names, title, fil=False, filter_list=None, plot_n
         if fil and group_names[i] in filter_list:
             continue
         outcome = group.get_group(group_names[i])
-        outcome_df = pd.DataFrame(outcome["time_stamp"].groupby(outcome.time_stamp.dt.to_period("M")).
-                                  agg('count').items(), columns=["date", "counts"]).sort_values(by=["date"])
+        outcome_df = pd.DataFrame(
+            outcome["time_stamp"]
+            .groupby(outcome.time_stamp.dt.to_period("M"))
+            .agg("count")
+            .items(),
+            columns=["date", "counts"],
+        ).sort_values(by=["date"])
         outcome_df["date"] = outcome_df["date"].apply(lambda x: x.to_timestamp())
-        fig.add_trace(go.Scatter(
-            x=outcome_df["date"],
-            y=outcome_df["counts"],
-            mode="lines",
-            name=group_names[i]
-        ))
-    fig.update_traces(hoverinfo='text+name', mode='lines')
+        fig.add_trace(
+            go.Scatter(
+                x=outcome_df["date"],
+                y=outcome_df["counts"],
+                mode="lines",
+                name=group_names[i],
+            )
+        )
+    fig.update_traces(hoverinfo="text+name", mode="lines")
     fig.update_layout(title_text=title)
     fig.update_layout(legend=dict(font=dict(family="Times", size=15, color="black")))
     fig.update_layout(
         xaxis_title="Date",
         yaxis_title="Count",
-        font=dict(
-            family="Times",
-            size=15,
-            color="#7f7f7f"
-        ))
+        font=dict(family="Times", size=15, color="#7f7f7f"),
+    )
     if plot_now:
         fig.show()
     else:
@@ -250,8 +272,14 @@ def get_quorn_pie(exploded_df):
     fig = go.Figure()
     outcome_quorn = quorn.groupby("outcomes")
     count = list(outcome_quorn["outcomes"].agg("count").sort_values(ascending=False))
-    outcomes = list(outcome_quorn["outcomes"].agg("count").sort_values(ascending=False).index)
-    fig.add_trace(go.Pie(values=count, labels=outcomes, textinfo='none', title="outcome from QUORN"))
+    outcomes = list(
+        outcome_quorn["outcomes"].agg("count").sort_values(ascending=False).index
+    )
+    fig.add_trace(
+        go.Pie(
+            values=count, labels=outcomes, textinfo="none", title="outcome from QUORN"
+        )
+    )
     fig.show()
 
 
@@ -268,10 +296,7 @@ def get_quorn_bar(exploded_df):
     quorn = exploded_df[exploded_df.products.str.contains("QUORN") == True]
     k = quorn[["outcomes", "year"]]
     fig = px.histogram(
-        k,
-        x="year",
-        color="outcomes",
-        title='Outcome histogram for Quorn'
+        k, x="year", color="outcomes", title="Outcome histogram for Quorn"
     )
     fig.show()
 
@@ -292,30 +317,39 @@ def plot_normalized_scatters(groups, group_names):
     fig = go.Figure()
     for i in range(len(group_names)):
         cat = groups[i]
-        max_num = max(cat["time_stamp"].groupby(cat.time_stamp.dt.to_period("M")).agg('count'))
-        category_df = pd.DataFrame((cat["time_stamp"].groupby(cat.time_stamp.dt.to_period("M")).
-                                    agg('count') / max_num).items(), columns=["date", "counts"]).sort_values(
-            by=["date"])
+        max_num = max(
+            cat["time_stamp"].groupby(cat.time_stamp.dt.to_period("M")).agg("count")
+        )
+        category_df = pd.DataFrame(
+            (
+                cat["time_stamp"].groupby(cat.time_stamp.dt.to_period("M")).agg("count")
+                / max_num
+            ).items(),
+            columns=["date", "counts"],
+        ).sort_values(by=["date"])
         category_df["date"] = category_df["date"].apply(lambda x: x.to_timestamp())
-        fig.add_trace(go.Scatter(x=category_df["date"], y=category_df["counts"], mode="lines", name=group_names[i]))
-    fig.update_traces(hoverinfo='text+name', mode='lines')
+        fig.add_trace(
+            go.Scatter(
+                x=category_df["date"],
+                y=category_df["counts"],
+                mode="lines",
+                name=group_names[i],
+            )
+        )
+    fig.update_traces(hoverinfo="text+name", mode="lines")
     fig.update_layout(title_text="Normalized categories over time")
     fig.update_layout(legend=dict(font=dict(family="Times", size=15, color="black")))
     fig.update_layout(
-        xaxis_title="Date",
-        font=dict(
-            family="Times",
-            size=15,
-            color="#7f7f7f"
-        ))
+        xaxis_title="Date", font=dict(family="Times", size=15, color="#7f7f7f")
+    )
 
 
-def symptom_counter(file_name: str, variable: int = 0):
-    """This function will return a dictionary containing counts of each symptom present in data file under a given condition, 
+def symptom_counter(data: pd.DataFrame, variable: int = 0):
+    """This function will return a dictionary containing counts of each symptom present in data under a given condition, 
     dictated by variable
 
     Args:
-        file_name (str): The CSV file on which function will execute
+        data (pd.DataFrame): Data to be analyzed
         cosmetic (int): 0 -> all categories, all products
                         1 -> only for cosmetics as a categorie
                         2 -> only for quorn as a product
@@ -325,13 +359,12 @@ def symptom_counter(file_name: str, variable: int = 0):
     """
 
     assert (
-            isinstance(file_name, str) and len(file_name) > 0
-    ), "file_name is either empty or not a string"
+        isinstance(data, pd.DataFrame) and len(data) > 0
+    ), "data is either empty or not a DataFrame"
     assert (
             isinstance(variable, int) and 0 <= variable <= 2
     ), "variable is not an integer in the range [0,2]"
     dic = defaultdict(int)
-    data = pd.read_csv(file_name)
     if variable == 1:
         data = data.drop(data.index[(data["category"] != "Cosmetics")])
     elif variable == 2:
@@ -389,19 +422,18 @@ def top_symptoms(dic, title):
     return top5
 
 
-def top_vitamins_symptom_distribution(file_name):
+def top_vitamins_symptom_distribution(data):
     """This function will plot a histogram for Reported Cases vs Products, where Products are the top vitamin products causing the
     top 5 symptoms
 
     Args:
-        file_name (str): Name of the file used
+        data (pd.DataFrame): Data to be analyzed
     """
     assert (
-            isinstance(file_name, str) and len(file_name) > 0
-    ), "file_name is either empty or a non string"
+        isinstance(data, pd.DataFrame) and len(data) > 0
+    ), "data is either empty or a not a DataFrame"
     fig = go.Figure()
     symptom_list = ["DIARRHOEA", "VOMITING", "NAUSEA", "ABDOMINAL PAIN"]
-    data = pd.read_csv(file_name)
     data["category"] = data["category"].str.strip()
     grouped_desc = data.groupby("category")
     add_on_list = []
@@ -443,3 +475,57 @@ def top_vitamins_symptom_distribution(file_name):
     )
     fig.update_layout(barmode="stack", bargap=0.1)
     fig.show()
+
+
+def age_dist_plot(
+    baseDf,
+    category,
+    relv_outcomes=[
+        "Death",
+        "Life Threatening",
+        "Hospitalization",
+        "Disability",
+        "Patient Visited ER",
+    ],
+):
+    """Plots a KDE plot for age distribution of reports across top outcomes for a given category
+
+    Args:
+        baseDf ([type]): [description]
+        category (string): Which category of products to plot age distribution for
+        relv_outcomes (list, optional):Defaults to [ "Death", "Life Threatening", "Hospitalization", "Disability", "Patient Visited ER", ].
+    """
+    assert isinstance(
+        baseDf, pd.DataFrame
+    ), "Check whether baseDf is Pandas Dataframe or not."
+    assert isinstance(category, str), "Check whether category is string or not."
+    assert isinstance(
+        relv_outcomes, list
+    ), "Check whether relv_outcomes is list or not."
+    assert len(relv_outcomes) > 1, "Atleast 1 relevant outcome must be selected"
+
+    outcome_age_dist = []
+
+    for outcome in relv_outcomes:
+        out_grp = (
+            baseDf.groupby("category")
+            .get_group(category)
+            .groupby("outcomes")
+            .get_group(outcome)
+        )
+        outcome_age_dist.append(out_grp["patient_age"])
+
+    fig1 = ff.create_distplot(
+        outcome_age_dist,
+        relv_outcomes,
+        bin_size=5,
+        show_hist=False,
+        histnorm="probability",
+        curve_type="kde",
+    )
+    fig1.update_layout(
+        xaxis_title="Patient Age",
+        yaxis_title="Probability Density",
+        font=dict(family="Courier New, monospace", size=16, color="black",),
+    )
+    fig1.show()

@@ -36,43 +36,35 @@ pip install nltk
 ## Project Organization
 
     ├── LICENSE
-    ├── README.md                  <- The top-level README for developers using this project.
-	├── ECE 143 Final Project.pdf  <- pdf of presentation.
+    ├── README.md                      <- The top-level README for developers using this project.
     ├── data
-    │   ├── processed      		   <- The final, canonical data sets for modeling.
-    │   └── raw            		   <- The original, immutable data dump.
+    │   ├── processed      		       <- The final, canonical data sets for modeling.
+    │   └── raw            		       <- The original, immutable data dump.
     │
-    ├── notebooks          		   <- Jupyter notebooks for visualization and data cleaning. 
+    ├── notebooks          		       <- Jupyter notebooks for visualization and data cleaning. 
     │
-    ├── references         		   <- News clippings related to adverse food events. 
+    ├── references         		       <- News clippings related to adverse food events. 
     │
-    ├── reports            		   <- Generated analysis as HTML, PDF, LaTeX, etc.
-    │   └── figures        		   <- Generated graphics and figures used in presentation. 
+    ├── reports            		       <- Generated analysis as HTML, PDF, LaTeX, etc.
+    │   └── ECE 143 Final Project.pdf  <- pdf of presentation.
     │
-    └── src                		   <- Source code for use in this project.
-        ├── __init__.py    		   <- Makes src a Python module.
+    └── src                		       <- Source code for use in this project.
+        ├── __init__.py    		       <- Makes src a Python module.
         │
-        ├── data           		   <- Scripts to generate data.
+        ├── data           		       <- Scripts to generate data.
         │   └── make_dataset.py
         │
-        └── visualization  		   <- Script to create exploratory and results oriented visualizations.
-            └── visualize.py
-    
+        └── visualization  		       <- Script to create exploratory and results oriented visualizations.
+            └── visualizations.ipynb   <- Visualization notebook. 
+ 
 
+## Visualization
 
-## Running the Code 
-
-### Data Cleaning
-
-Script for cleaning the raw data is found in <code>src/data</code>.
+The notebook for visualization of data is found in <code>src/visualization</code>.
 
 ```
-python make_dataset.py
+visualizations.ipynb
 ```
-
-### Visualization
-
-Notebook for visualization of data is found in <code>src/visualization</code>.
 
 --------
 
