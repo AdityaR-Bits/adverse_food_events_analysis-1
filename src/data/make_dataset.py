@@ -18,6 +18,9 @@ def brand_preprocess(row, trim_len=2):
     Returns:
         [str]: brand name corresponding to a product.
     """
+    assert isinstance(
+        row, pd.Series
+    ), "Check whether the function is called over Series"
 
     if pd.isna(row["product"]) or pd.isna(row["product"]):
         return pd.NA
@@ -58,7 +61,9 @@ def age_preprocess(row):
         [float]: value of patient_age converted to years unit 
     """
 
-    assert isinstance(row, pd.Series)
+    assert isinstance(
+        row, pd.Series
+    ), "Check whether the function is called over Series"
 
     age_conv = {
         "month(s)": 1 / 12,
